@@ -70,7 +70,7 @@ const Shop = () => {
                     </h1>
 
                     <p className="text-gray-500 mt-1">
-                        {shopData.location}
+                        {shopData.location.text}
                     </p>
 
                     <div className="flex items-center gap-2 mt-2">

@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from 'react-router-dom'
 import { loginUser, registerUser } from "../redux/slices/authSlice";
 
+
 const Login = () => {
+    const navigate = useNavigate()
     const dispatch = useDispatch();
-    const { loading } = useSelector((state) => state.auth);
+    const { loading, isAuthenticated } = useSelector((state) => state.auth);
 
     const [role, setRole] = useState("client");
     const [isRegister, setIsRegister] = useState(false);
@@ -12,6 +15,18 @@ const Login = () => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            if (role === "vendor") {
+                // Vendor paneli ayrı bir projedeyse, tam URL’ye yönlendir
+                window.location.href = "http://localhost:5174/add";
+            } else {
+                navigate("/"); // Normal kullanıcı
+            }
+        }
+    }, [isAuthenticated, role, navigate]);
+
 
     const handleSubmit = (e) => {
         e.preventDefault();

@@ -11,11 +11,7 @@ export const loginUser = createAsyncThunk(
                 `${import.meta.env.VITE_BACKEND_URL}/api/auth/login`,
                 { email, password },
                 { withCredentials: true }
-            );
-            console.log(response.data)
-            if (data.success) {
-                navigate("/")
-            }
+            );;
             return response.data; // { success, role }
         } catch (error) {
             return rejectWithValue(error.message);
@@ -33,7 +29,6 @@ export const registerUser = createAsyncThunk(
                 { name, email, password, role },
                 { withCredentials: true }
             );
-            console.log(response.data)
             return response.data; // { success, role }
 
         } catch (error) {
@@ -66,7 +61,7 @@ const authSlice = createSlice({
             .addCase(loginUser.fulfilled, (state, action) => {
                 state.loading = false;
                 state.isAuthenticated = true;
-                state.role = action.payload;
+                state.role = action.payload.role;
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.loading = false;
@@ -81,7 +76,7 @@ const authSlice = createSlice({
             .addCase(registerUser.fulfilled, (state, action) => {
                 state.loading = false;
                 state.isAuthenticated = true;
-                state.role = action.payload;
+                state.role = action.payload.role;
             })
             .addCase(registerUser.rejected, (state, action) => {
                 state.loading = false;

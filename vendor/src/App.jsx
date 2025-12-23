@@ -11,27 +11,22 @@ import { ToastContainer } from 'react-toastify';
 const App = () => {
 
   return (
-    <div className='bg-gray-50 min-h-screen'>
+    <div className='px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]'>
       <ToastContainer />
-      
-    
-        <>
-          <Navbar />
-          <hr />
-          <div className='flex w-full'>
-            <Sidebar />
-            <div className='w-[70%] mx-auto ml-[max(5vw, 25px)] my-8 text-gray-600 text-base'>
-              <Routes>
-               <Route path='/add' element={<Add />} /> 
-               <Route path='/' element={<Add />} />
-               <Route path='/list' element={<List />} />
-               
-              </Routes>
-            </div>
+      <>
+        <Navbar />
+        <hr />
+        <div className='flex w-full'>
+          <Sidebar />
+          <div className='w-[70%] mx-auto ml-[max(5vw, 25px)] my-8 text-gray-600 text-base'>
+            <Routes>
+              <Route path='/add' element={<Add />} />
+              <Route path='/' element={<Add />} />
+              <Route path='/list' element={<List />} />
+            </Routes>
           </div>
-        </>
-      
-
+        </div>
+      </>
     </div>
   )
 }

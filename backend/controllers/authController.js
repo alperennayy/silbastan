@@ -64,7 +64,7 @@ export const registerUser = async (req, res) => {
 
         return res.json({
             success: true,
-            role: user.role
+            role: user.role,
         })
 
     } catch (error) {

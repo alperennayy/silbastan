@@ -5,6 +5,7 @@ import { fetchCities, fetchDistricts } from "../redux/slices/locationSlice";
 import { assets } from "../assets/assets";
 
 
+
 const Add = () => {
 
 
@@ -127,6 +128,8 @@ const Add = () => {
 
     dispatch(createShop(formData));
   };
+
+
 
   return (
     <form onSubmit={submitHandler} className="flex flex-col gap-4 max-w-xl">

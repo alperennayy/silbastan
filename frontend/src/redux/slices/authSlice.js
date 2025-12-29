@@ -5,11 +5,11 @@ import axios from 'axios'
 /* LOGIN */
 export const loginUser = createAsyncThunk(
     "auth/loginUser",
-    async ({ email, password }, { rejectWithValue }) => {
+    async ({ email, password, role }, { rejectWithValue }) => {
         try {
             const response = await axios.post(
                 `${import.meta.env.VITE_BACKEND_URL}/api/auth/login`,
-                { email, password },
+                { email, password, role },
                 { withCredentials: true }
             );;
             return response.data; // { success, role }
@@ -37,6 +37,22 @@ export const registerUser = createAsyncThunk(
     }
 );
 
+export const logoutUser = createAsyncThunk(
+    "auth/logoutUser",
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await axios.post(
+                `${import.meta.env.VITE_BACKEND_URL}/api/auth/logout`,
+                {},
+                { withCredentials: true }
+            );
+            return response.data
+        } catch (error) {
+            return rejectWithValue(error.message)
+        }
+    }
+)
+
 const authSlice = createSlice({
     name: "auth",
     initialState: {
@@ -44,12 +60,10 @@ const authSlice = createSlice({
         role: null,
         loading: false,
         error: null,
+        loggedOut: false
     },
     reducers: {
-        logout: (state) => {
-            state.isAuthenticated = false;
-            state.role = null;
-        },
+
     },
     extraReducers: (builder) => {
         builder
@@ -81,9 +95,24 @@ const authSlice = createSlice({
             .addCase(registerUser.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
+            })
+
+            // LOGOUT
+            .addCase(logoutUser.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(logoutUser.fulfilled, (state) => {
+                state.loading = false;
+                state.isAuthenticated = false; // 🔥 çıkış yapıldı
+            })
+            .addCase(logoutUser.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
             });
+
     },
 });
 
-export const { logout } = authSlice.actions;
+export const { } = authSlice.actions;
 export default authSlice.reducer;

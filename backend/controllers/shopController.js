@@ -55,3 +55,23 @@ export const createShop = async (req, res) => {
         res.json({ success: false, message: error.message });
     }
 };
+
+export const listShops = async (req, res) => {
+    try {
+
+        //db den tüm mağazaları çekicez
+        const shops = await Shop.find()
+
+        console.log("mağazalar :", shops)
+
+        res.json({ success: true, message: "mağazalar listelendi", shops })
+
+
+    } catch (error) {
+        console.log(error);
+        res.json({
+            success: false,
+            message: error.message
+        });
+    }
+}

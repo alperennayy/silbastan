@@ -1,5 +1,5 @@
 import express from 'express';
-import { createShop } from '../controllers/shopController.js';
+import { createShop, listShops } from '../controllers/shopController.js';
 import upload from '../middleware/multer.js';
 import authVendor from '../middleware/vendorAuth.js';
 
@@ -15,6 +15,7 @@ shopRouter.post('/create', authVendor,
     ]),
     createShop
 );
+shopRouter.get('/list', listShops)
 
 
 export default shopRouter;

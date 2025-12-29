@@ -34,7 +34,7 @@ const Login = () => {
         if (isRegister) {
             dispatch(registerUser({ name, email, password, role }));
         } else {
-            dispatch(loginUser({ email, password }));
+            dispatch(loginUser({ email, password, role }));
         }
     };
 
@@ -47,7 +47,7 @@ const Login = () => {
                     <button
                         onClick={() => setRole("client")}
                         className={`flex-1 py-3 font-semibold transition
-              ${role === "customer"
+              ${role === "client"
                                 ? "text-blue-600 border-b-4 border-blue-600"
                                 : "text-gray-400 hover:text-blue-600"
                             }`}

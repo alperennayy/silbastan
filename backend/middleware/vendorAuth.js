@@ -2,9 +2,6 @@ import jwt from 'jsonwebtoken';
 
 const authVendor = (req, res, next) => {
 
-    console.log("AUTH req.files:", req.files);
-
-
     try {
         const { token } = req.cookies;
 

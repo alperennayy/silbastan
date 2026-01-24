@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createShop } from "../redux/slices/shopSlice";
+import { createShop, setVendorShop } from "../redux/slices/shopSlice";
 import { fetchCities, fetchDistricts } from "../redux/slices/locationSlice";
 import { assets } from "../assets/assets";
 
@@ -8,6 +8,7 @@ import { assets } from "../assets/assets";
 
 const Add = () => {
 
+ 
 
   const dispatch = useDispatch();
   const { loading, error } = useSelector(state => state.shop);
@@ -53,6 +54,7 @@ const Add = () => {
       setToken(localStorage.getItem('token'))
     }
   }, [])
+ 
 
 
   /* ================= HELPERS ================= */
@@ -87,11 +89,49 @@ const Add = () => {
     setEmpImage(null);
     setEmpServices([]);
   };
+  const removeEmployee = (employeeId) => {
+  setEmployees(prev => prev.filter(emp => emp.id !== employeeId));
+};
+
+  const removeService = (serviceId) => {
+  // 1. services listesinden sil
+  setServices(prev => prev.filter(s => s.id !== serviceId));
+
+  // 2. employee eklerken seçili olanlardan sil
+  setEmpServices(prev => prev.filter(id => id !== serviceId));
+
+  // 3. daha önce eklenmiş çalışanlardan sil
+  setEmployees(prev =>
+    prev.map(emp => ({
+      ...emp,
+      services: emp.services.filter(id => id !== serviceId)
+    }))
+     .filter(emp => emp.services.length > 0)
+  );
+};
+
+
 
   /* ================= SUBMIT ================= */
   const submitHandler = (e) => {
     e.preventDefault();
     console.log("submitHandler tetiklendi");
+    const shopData = {
+    name,
+    description,
+    category,
+    salonType,
+    city,
+    district,
+    services,
+    employees,
+    images: [image1, image2, image3, image4],
+  };
+
+  // 🔥 UI STATE → REDUX
+  dispatch(setVendorShop(shopData));
+  console.log("DISPATCH EDILEN shopData:", shopData);
+
 
     const formData = new FormData();
 
@@ -110,6 +150,8 @@ const Add = () => {
     formData.append("services", JSON.stringify(services));
     formData.append("employees", JSON.stringify(employees));
 
+    dispatch(createShop(formData));
+
     console.log("submitHandler tetiklendi");
     console.log("FormData objesi:", {
       name,
@@ -125,110 +167,331 @@ const Add = () => {
       image3,
       image4
     });
-
-    dispatch(createShop(formData));
-  };
+   
+};
 
 
 
   return (
-    <form onSubmit={submitHandler} className="flex flex-col gap-4 max-w-xl">
+  <form onSubmit={submitHandler} className="flex flex-col gap-4 max-w-xl">
 
-      <h2 className="font-bold text-xl">Add Shop</h2>
+    <h2 className="font-bold text-xl">İşletme Bilgileri</h2>
 
-      {/* ================= IMAGES ================= */}
-      <div>
-        <p className="mb-2">Upload Images</p>
-        <div className="flex gap-2">
-          <label htmlFor="image1">
-            <img className="w-20 h-20 object-cover cursor-pointer"
-              src={!image1 ? assets.upload_area : URL.createObjectURL(image1)} />
-            <input hidden type="file" id="image1" onChange={e => setImage1(e.target.files[0])} />
+    {/* ================= IMAGES ================= */}
+    <div>
+      <div className="flex gap-2">
+        {[image1, image2, image3, image4].map((img, i) => (
+          <label
+            key={i}
+            htmlFor={`image${i + 1}`}
+            className="border border-dashed border-gray-300  cursor-pointer"
+          >
+            <img
+              className="w-20 h-20 object-cover rounded-md"
+              src={!img ? assets.upload_area : URL.createObjectURL(img)}
+            />
+            <input
+              hidden
+              type="file"
+              id={`image${i + 1}`}
+              onChange={e => {
+                const setters = [setImage1, setImage2, setImage3, setImage4];
+                setters[i](e.target.files[0]);
+              }}
+            />
           </label>
-
-          <label htmlFor="image2">
-            <img className="w-20 h-20 object-cover cursor-pointer"
-              src={!image2 ? assets.upload_area : URL.createObjectURL(image2)} />
-            <input hidden type="file" id="image2" onChange={e => setImage2(e.target.files[0])} />
-          </label>
-
-          <label htmlFor="image3">
-            <img className="w-20 h-20 object-cover cursor-pointer"
-              src={!image3 ? assets.upload_area : URL.createObjectURL(image3)} />
-            <input hidden type="file" id="image3" onChange={e => setImage3(e.target.files[0])} />
-          </label>
-
-          <label htmlFor="image4">
-            <img className="w-20 h-20 object-cover cursor-pointer"
-              src={!image4 ? assets.upload_area : URL.createObjectURL(image4)} />
-            <input hidden type="file" id="image4" onChange={e => setImage4(e.target.files[0])} />
-          </label>
-        </div>
+        ))}
       </div>
+    </div>
 
-      {/* ================= SHOP INFO ================= */}
-      <input value={name} onChange={e => setName(e.target.value)} placeholder="Shop name" />
-      <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Description" />
+    {/* ================= SHOP INFO ================= */}
+    <input
+      value={name}
+      onChange={e => setName(e.target.value)}
+      placeholder="İşletme ismi"
+      className="px-3 py-2 border border-gray-300 rounded-md"
+    />
 
-      <input value={category} onChange={e => setCategory(e.target.value)} placeholder="Category" />
-      <input value={salonType} onChange={e => setSalonType(e.target.value)} placeholder="Salon Type" />
+    <textarea
+      value={description}
+      onChange={e => setDescription(e.target.value)}
+      placeholder="İşletmenizi tanıtın.."
+      className="px-3 py-2 border border-gray-300 rounded-md"
+      rows={3}
+    />
 
-      {/* ================= LOCATION ================= */}
-      <select value={city} onChange={e => {
+    {/* Client Category – placeholder only */}
+    <select
+      value={category}
+      onChange={e => setCategory(e.target.value)}
+      className="px-3 py-2 border border-gray-300 rounded-md bg-white"
+    >
+      <option value="">Cinsiyet seçiniz..</option>
+      <option value="Men">Men</option>
+      <option value="Women">Women</option>
+      <option value="Unisex">Unisex</option>
+    </select>
+
+    {/* Salon Type – placeholder only */}
+    <select
+      value={salonType}
+      onChange={e => setSalonType(e.target.value)}
+      className="px-3 py-2 border border-gray-300 rounded-md bg-white"
+    >
+      <option value="">İşletme tipi..</option>
+      <option value="Kuaför">Kuaför</option>
+      <option value="Berber">Berber</option>
+      <option value="Güzellik Merkezi">Güzellik Merkezi</option>
+    </select>
+
+    {/* ================= LOCATION ================= */}
+    <select
+      value={city}
+      onChange={e => {
         setCity(e.target.value);
         dispatch(fetchDistricts(e.target.value));
-      }}>
-        <option value="">City</option>
-        {cityList.map(city => <option key={city.id} value={city.name}>{city.name}</option>)}
-      </select>
+      }}
+      className="px-3 py-2 border border-gray-300 rounded-md bg-white"
+    >
+      <option value="">Şehir seçiniz..</option>
+      {cityList.map(city => (
+        <option key={city.id} value={city.name}>{city.name}</option>
+      ))}
+    </select>
 
-      <select value={district} onChange={e => setDistrict(e.target.value)}>
-        <option value="">District</option>
-        {districtList.map(district => <option key={district.id} value={district.name}>{district.name}</option>)}
-      </select>
+    <select
+      value={district}
+      onChange={e => setDistrict(e.target.value)}
+      className="px-3 py-2 border border-gray-300 rounded-md bg-white"
+    >
+      <option value="">İlçe seçiniz</option>
+      {districtList.map(district => (
+        <option key={district.id} value={district.name}>{district.name}</option>
+      ))}
+    </select>
 
-      {/* ================= SERVICES ================= */}
-      <div className="flex gap-2">
-        <input value={serviceName} onChange={e => setServiceName(e.target.value)} placeholder="Service name" />
-        <input value={price} onChange={e => setPrice(e.target.value)} placeholder="Price" />
-        <button type="button" onClick={addService}>+</button>
+    {/* ================= SERVICES ================= */}
+    <div className="flex gap-2 items-center">
+      <input
+        value={serviceName}
+        onChange={e => setServiceName(e.target.value)}
+        placeholder="Hizmet ismi"
+        className="px-3 py-2 border border-gray-300 rounded-md"
+      />
+      <input
+  type="text"
+  inputMode="numeric"
+  pattern="[0-9]*"
+  value={price}
+  onChange={(e) => {
+    const value = e.target.value;
+    if (/^\d*$/.test(value)) {
+      setPrice(value);
+    }
+  }}
+  placeholder="Fiyat"
+  className="px-3 py-2 border border-gray-300 rounded-md w-24"
+/>
+
+      <button
+        type="button"
+        onClick={addService}
+        className="px-3 py-2 border border-black rounded-md hover:bg-black hover:text-white"
+      >
+        +
+      </button>
+    </div>
+      {services.length > 0 && (
+  <p className="text-sm font-medium mt-2">
+    Verilen hizmetler:
+  </p>
+)}
+
+   {services.map(s => (
+  <div
+    key={s.id}
+    className="flex justify-between items-center px-4 py-3 rounded-lg border
+               bg-gray-50 shadow-sm
+               transition hover:shadow-md hover:border-black group"
+  >
+    <div className="flex flex-col">
+      <span className="font-semibold text-sm">{s.name} - {s.price} ₺</span>
+      
+    </div>
+
+    <button
+      type="button"
+      onClick={() => removeService(s.id)}
+      className="opacity-0 group-hover:opacity-100 transition
+                 text-xs px-2 py-1 rounded
+                 text-red-600 hover:bg-red-50"
+    >
+      Sil
+    </button>
+  </div>
+))}
+
+
+
+    {/* ================= EMPLOYEES ================= */}
+    <div className="flex flex-col gap-2">
+      <h2 className="font-bold text-xl">Çalışan Bilgileri</h2>
+
+      <div className="flex gap-2 flex-wrap items-center">
+        <input
+          value={empName}
+          onChange={e => setEmpName(e.target.value)}
+          placeholder="Çalışan ismi giriniz.."
+          className="px-3 py-2 border border-gray-300 rounded-md"
+        />
+
+        <input
+          value={empDesc}
+          onChange={e => setEmpDesc(e.target.value)}
+          placeholder="Çalışan hakkında.."
+          className="px-3 py-2 border border-gray-300 rounded-md"
+        />
+
+        {/* employee image – SAME AS SHOP IMAGE */}
+        <label className="border border-dashed border-gray-300 cursor-pointer">
+          <img
+            className="w-12 h-12 object-cover rounded-md"
+            src={!empImage ? assets.upload_area : URL.createObjectURL(empImage)}
+          />
+          <input
+            hidden
+            type="file"
+            onChange={e => setEmpImage(e.target.files[0])}
+          />
+        </label>
       </div>
 
-      {services.map(s => (
-        <p key={s.id}>{s.name} - {s.price}₺</p>
-      ))}
+      
+        {services.length > 0 && (
+  <p className="text-sm font-medium mt-2">
+    Çalışanın verdiği hizmetleri seçiniz:
+  </p>
+)}
+<div className="flex flex-wrap gap-2">
+  {services.map(s => {
+    const selected = empServices.includes(s.id);
 
-      {/* ================= EMPLOYEES ================= */}
-      <input value={empName} onChange={e => setEmpName(e.target.value)} placeholder="Employee name" />
-      <input value={empDesc} onChange={e => setEmpDesc(e.target.value)} placeholder="Employee description" />
-      <input type="file" onChange={e => setEmpImage(e.target.files[0])} />
+    return (
+      <div
+        key={s.id}
+        onClick={() =>
+          setEmpServices(prev =>
+            selected
+              ? prev.filter(id => id !== s.id)
+              : [...prev, s.id]
+          )
+        }
+        className={`
+          px-4 py-2 border rounded-md text-sm cursor-pointer select-none
+          transition
+          ${selected
+            ? "bg-black text-white border-black"
+            : "border-gray-300 hover:bg-gray-100 hover:border-black"}
+        `}
+      >
+        {s.name}
+      </div>
+    );
+  })}
+  </div>
 
-      {services.map(s => (
-        <label key={s.id}>
-          <input
-            type="checkbox"
-            checked={empServices.includes(s.id)}
-            onChange={() =>
-              setEmpServices(prev =>
-                prev.includes(s.id)
-                  ? prev.filter(id => id !== s.id)
-                  : [...prev, s.id]
-              )
-            }
-          />
-          {s.name}
-        </label>
-      ))}
 
-      <button type="button" onClick={addEmployee}>Add Employee</button>
 
-      <button type="submit" disabled={loading}>
-        {loading ? "Ekleniyor..." : "ADD SHOP"}
+      <button
+        type="button"
+        onClick={addEmployee}
+        className="self-start px-3 py-1 text-sm border border-black rounded-md hover:bg-black hover:text-white"
+      >
+        + Çalışan Ekle
       </button>
 
-      {error && <p className="text-red-500">{error}</p>}
-    </form>
-  );
+      {/* employee list: name – services */}
+     {employees.map(emp => (
+  <div
+    key={emp.id}
+    className="flex items-center justify-between gap-4
+               p-3 rounded-xl border bg-white
+               transition hover:shadow-md hover:border-black group"
+  >
+    {/* LEFT: avatar + info */}
+    <div className="flex items-center gap-3">
+      {/* avatar */}
+      <div className="w-10 h-10 rounded-full overflow-hidden border bg-gray-100">
+        {emp.image ? (
+          <img
+            src={URL.createObjectURL(emp.image)}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">
+            ?
+          </div>
+        )}
+      </div>
+
+      {/* name + services */}
+      <div className="flex items-center gap-3 flex-wrap">
+  <span className="font-semibold text-sm whitespace-nowrap">
+    {emp.name} •
+  </span>
+
+  <div className="flex flex-wrap gap-1">
+    {emp.services.map(id => {
+      const service = services.find(s => s.id === id);
+      if (!service) return null;
+
+      return (
+        <span
+          key={id}
+          className="px-2 py-[2px] text-[11px] rounded-full
+                     bg-gray-100 text-gray-600"
+        >
+          {service.name}
+        </span>
+      );
+    })}
+  </div>
+</div>
+
+    </div>
+
+    {/* RIGHT: delete */}
+    <button
+      type="button"
+      onClick={() => removeEmployee(emp.id)}
+      className="opacity-0 group-hover:opacity-100 transition
+                 text-xs px-2 py-1 rounded
+                 text-red-600 hover:bg-red-50"
+      title="Çalışanı sil"
+    >
+      Sil
+    </button>
+  </div>
+))}
+
+
+
+
+    </div>
+
+    <button
+      type="submit"
+      disabled={loading}
+      className="mt-2 px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 disabled:opacity-50"
+    >
+      {loading ? "Ekleniyor..." : "İşletmeyi Oluştur"}
+    </button>
+
+    {error && <p className="text-red-500">{error}</p>}
+  </form>
+);
+
+
 };
 
 export default Add;  

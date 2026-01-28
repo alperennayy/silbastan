@@ -17,7 +17,7 @@ const shopSchema = new mongoose.Schema({
     location: {
         city: { type: String, required: true },
         district: { type: String, required: true },
-
+        text: { type: String, required: true }
     },
 
     rating: { type: Number, default: 0 },

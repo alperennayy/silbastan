@@ -10,10 +10,10 @@ const EmployeeCard = ({ employeeId }) => {
     const { selectedEmployee } = useSelector(state => state.reservation)
 
     // 🔥 employeeId'ye göre employee'yi shopData'dan bul
-    const employee = shopData?.employees?.find(emp => emp._id === employeeId)
+    const employee = shopData?.employees?.find(emp => emp.id === employeeId)
 
     // 🔥 Seçili mi kontrol et
-    const isSelected = selectedEmployee?._id === employeeId
+    const isSelected = selectedEmployee && selectedEmployee?.id === employeeId
 
     // 🔥 Employee bulunamazsa
     if (!employee) {
@@ -38,7 +38,7 @@ const EmployeeCard = ({ employeeId }) => {
         >
             {/* IMAGE */}
             <img
-                src={employee.image[0]}
+                src={employee.image}
                 alt={employee.name}
                 className='w-28 h-28 object-cover rounded'
             />
@@ -49,14 +49,15 @@ const EmployeeCard = ({ employeeId }) => {
             </p>
 
             {/* SERVICES */}
-            {employee.service.map((srv, idx) => (
-                <p
-                    key={idx}
-                    className={`text-sm ${isSelected ? 'text-white/80' : 'text-gray-500'}`}
-                >
-                    {srv}
-                </p>
-            ))}
+            {employee.services.map((serviceId) => {
+                const service = shopData.services.find(s => s.id === serviceId);
+                if (!service) return null; // ID eşleşmezse atla
+                return (
+                    <p key={service.id} >
+                        {service.name}
+                    </p>
+                );
+            })}
         </button>
     )
 }

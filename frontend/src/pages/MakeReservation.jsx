@@ -14,12 +14,14 @@ const MakeReservation = () => {
     const { shopData, loading } = useSelector(state => state.shop)
     const { selectedService, selectedEmployee } = useSelector(state => state.reservation)
 
+
     // 🔹 Shop verisi yoksa çek (Aynı)
     useEffect(() => {
         if (!shopData) {
             dispatch(fetchShopData(shopId))
         }
     }, [dispatch, shopId, shopData])
+
 
     // 🔹 YENİ: ShopId değiştiğinde seçimleri temizle
     useEffect(() => {
@@ -38,9 +40,10 @@ const MakeReservation = () => {
     /* 🔹 Filtrelenmiş çalışanlar (Aynı) */
     const filteredEmployees = selectedService
         ? shopData.employees.filter(emp =>
-            emp.service.includes(selectedService.name)
+            emp.services.includes(selectedService.id)  // 🔹 ID ile eşleştir
         )
-        : shopData.employees
+        : shopData.employees;
+
 
     /* 🔹 URL oluşturma (Aynı) */
     const slugify = (text) =>
@@ -65,7 +68,7 @@ const MakeReservation = () => {
                 <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:w-2/3'>
                     {/* 🔥 DEĞİŞTİ: EmployeeCard sadece employeeId alıyor */}
                     {filteredEmployees.map(emp => (
-                        <EmployeeCard key={emp._id} employeeId={emp._id} />
+                        <EmployeeCard key={emp.id} employeeId={emp.id} />
                     ))}
                 </div>
             </div>

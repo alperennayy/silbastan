@@ -4,10 +4,7 @@ import { createShop } from "../redux/slices/shopSlice";
 import { fetchCities, fetchDistricts } from "../redux/slices/locationSlice";
 import { assets } from "../assets/assets";
 
-
-
 const Add = () => {
-
 
   const dispatch = useDispatch();
   const { loading, error } = useSelector(state => state.shop);
@@ -69,7 +66,7 @@ const Add = () => {
   };
 
   const addEmployee = () => {
-    if (!empName || empServices.length === 0) return;
+    if (!empName || empServices.length === 0 || !empImage) return;
 
     setEmployees(prev => [
       ...prev,
@@ -101,6 +98,7 @@ const Add = () => {
     formData.append("salonType", salonType);
     formData.append("city", city);
     formData.append("district", district);
+    formData.append("text", `${district}/${city}`)
 
     image1 && formData.append("image1", image1);
     image2 && formData.append("image2", image2);
@@ -108,23 +106,25 @@ const Add = () => {
     image4 && formData.append("image4", image4);
 
     formData.append("services", JSON.stringify(services));
-    formData.append("employees", JSON.stringify(employees));
 
-    console.log("submitHandler tetiklendi");
-    console.log("FormData objesi:", {
-      name,
-      description,
-      category,
-      salonType,
-      city,
-      district,
-      services,
-      employees,
-      image1,
-      image2,
-      image3,
-      image4
+    // 🔥 EMPLOYEE IMAGES (AYNI MANTIK)
+    employees.forEach(emp => {
+      if (emp.image) {
+        formData.append("empImages", emp.image);
+      }
     });
+
+    // employees JSON (image yok!)
+    formData.append(
+      "employees",
+      JSON.stringify(
+        employees.map(e => ({
+          name: e.name,
+          description: e.description,
+          services: e.services
+        }))
+      )
+    );
 
     dispatch(createShop(formData));
   };

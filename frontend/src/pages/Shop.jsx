@@ -17,8 +17,8 @@ const Shop = () => {
     }, [dispatch, shopId])
 
     useEffect(() => {
-        if (shopData?.image?.length) {
-            setImage(shopData.image[0])
+        if (shopData?.images?.length) {
+            setImage(shopData.images[0])
         }
     }, [shopData])
 
@@ -49,7 +49,7 @@ const Shop = () => {
 
                     {/* THUMBNAILS */}
                     <div className="flex gap-3 mt-4 overflow-x-auto">
-                        {shopData.image.map((img, index) => (
+                        {shopData.images.map((img, index) => (
                             <img
                                 key={index}
                                 src={img}

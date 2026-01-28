@@ -1,6 +1,19 @@
 import Shop from "../models/shopModel.js";
 import { v2 as cloudinary } from "cloudinary";
 
+export const getShopById = async (req, res) => {
+    try {
+        const shop = await Shop.findById(req.params.id)
+        if (!shop) {
+            return res.status(404).json({ message: "Shop not found" })
+        }
+
+        res.json(shop)
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
 export const createShop = async (req, res) => {
 
     try {
@@ -25,6 +38,24 @@ export const createShop = async (req, res) => {
             })
         );
 
+        const empImages = req.files.empImages || [];
+
+        const empImagesUrl = await Promise.all(
+            empImages.map(async (item) => {
+                const result = await cloudinary.uploader.upload(item.path, {
+                    folder: "employees",
+                    resource_type: "image",
+                })
+                return result.secure_url
+            })
+        )
+
+        const employeesParsed = JSON.parse(employees);
+
+        employeesParsed.forEach((emp, index) => {
+            emp.image = empImagesUrl[index];
+        });
+
         // =================== SHOP DATA ===================
         const shopData = {
             name,
@@ -38,7 +69,7 @@ export const createShop = async (req, res) => {
             },
             images: imagesUrl,
             services: JSON.parse(services),   // [{_id, name, price}]
-            employees: JSON.parse(employees), // [{_id, name, image, service}]
+            employees: employeesParsed, // [{_id, name, image, service}]
             date: Date.now(),
             rating: 0, // başlangıç rating,
             vendorId: req.vendor.id // ✅ giriş yapan vendor ID

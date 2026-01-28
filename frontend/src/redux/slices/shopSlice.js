@@ -1,6 +1,6 @@
-// redux/slices/shopSlice.js
+import axios from "axios";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { shops } from "../../assets/assets";
+
 
 // 🔥 ASYNC THUNK
 export const fetchShopData = createAsyncThunk(
@@ -8,17 +8,10 @@ export const fetchShopData = createAsyncThunk(
     async (shopId, { rejectWithValue }) => {
         try {
             // 🔴 ŞU AN assets
-            const shop = shops.find(shop => shop._id === shopId);
+            const response = await axios.get(
+                `${import.meta.env.VITE_BACKEND_URL}/api/shops/${shopId}`)
+            return response.data
 
-            if (!shop) {
-                return rejectWithValue("Shop bulunamadı");
-            }
-
-            return shop;
-
-            // 🟢 BACKEND GELİNCE SADECE BURASI DEĞİŞECEK
-            // const res = await axios.get(`/api/shops/${shopId}`)
-            // return res.data
 
         } catch (error) {
             return rejectWithValue(error.message);
@@ -26,7 +19,20 @@ export const fetchShopData = createAsyncThunk(
     }
 );
 
+export const listShops = createAsyncThunk(
+    'shop/listShops',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/shops/list`)
+            return response.data
+        } catch (error) {
+            return rejectWithValue(error.message)
+        }
+    }
+)
+
 const initialState = {
+    shops: [],
     shopData: null,
     loading: false,
     error: null
@@ -40,6 +46,7 @@ const shopSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
+            //Shop Datayı çekmek için
             .addCase(fetchShopData.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -51,7 +58,21 @@ const shopSlice = createSlice({
             .addCase(fetchShopData.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
-            });
+            })
+            //Mağazaları listelemk için
+            .addCase(listShops.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(listShops.fulfilled, (state, action) => {
+                state.loading = false;
+                state.shops = action.payload.shops;
+                state.error = null;
+            })
+            .addCase(listShops.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload
+            })
     }
 });
 

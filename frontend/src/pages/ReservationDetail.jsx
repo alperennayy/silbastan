@@ -1,10 +1,12 @@
-import React, { useState } from 'react'
-import { useSelector } from 'react-redux'
+import React, { useState, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useParams } from 'react-router-dom'
 
 const ReservationDetail = () => {
     const { selectedService, selectedEmployee } = useSelector(
         state => state.reservation
     )
+    const { shopData } = useSelector(state => state.shop)
 
     const [selectedDate, setSelectedDate] = useState(null)
     const [selectedTime, setSelectedTime] = useState(null)
@@ -32,17 +34,27 @@ const ReservationDetail = () => {
         "10:00 am", "10:30 am", "11:00 am", "11:30 am"
     ]
 
+    const { shopId } = useParams()
+
+    const dispatch = useDispatch()
+
+    useEffect(() => {
+        if (!shopData) {
+            dispatch(fetchShopData(shopId))
+        }
+    }, [dispatch, shopId, shopData])
+
     return (
         <div className="bg-white p-4 md:p-6 rounded-xl shadow-lg w-full flex flex-col md:flex-row gap-4 md:gap-6">
 
             {/* Resim */}
-            <div className="w-full md:w-auto flex justify-center md:block">
+            {<div className="w-full md:w-auto flex justify-center md:block">
                 <img
-                    src={selectedEmployee.image[0]}
+                    src={selectedEmployee.image}
                     alt={selectedEmployee.name}
                     className="w-36 h-36 md:w-48 md:h-48 object-cover rounded-xl"
                 />
-            </div>
+            </div>}
 
             {/* Detaylar */}
             <div className="flex-1 flex flex-col gap-4 items-center md:items-start">
@@ -58,15 +70,21 @@ const ReservationDetail = () => {
                     </p>
 
                     <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-3">
-                        {selectedEmployee.service.map((srv, idx) => (
-                            <span
-                                key={idx}
-                                className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs md:text-sm"
-                            >
-                                {srv}
-                            </span>
-                        ))}
+                        {selectedEmployee.services.map((serviceId) => {
+                            const service = shopData.services.find(s => s.id === serviceId)
+                            if (!service) return null
+
+                            return (
+                                <span
+                                    key={service.id}
+                                    className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs md:text-sm"
+                                >
+                                    {service.name}
+                                </span>
+                            )
+                        })}
                     </div>
+
                 </div>
 
                 {/* Hizmet */}

@@ -29,6 +29,7 @@ app.use(cors({ origin: allowedOrigins, credentials: true }))
 app.use('/api/auth', authRouter)
 app.use("/api/shops", shopRouter);
 
+
 app.get('/', (req, res) => {
     res.send('API Working')
 })

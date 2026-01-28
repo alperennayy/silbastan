@@ -22,12 +22,12 @@ const ServiceList = () => { // 🔥 Props almıyor!
 
     return (
         <div className='flex flex-col gap-3 text-sm text-gray-600 sm:w-1/3'>
-            {shopData.services.map((service, index) => (
+            {shopData.services.map((service) => (
                 <button
-                    key={index}
+                    key={service.id}
                     onClick={() => dispatch(setSelectedService(service))}
                     className={`w-full pl-3 py-2 pr-6 text-start border rounded cursor-pointer transition-all 
-                    ${selectedService?._id === service._id ? 'bg-blue-500 text-white' : 'border-gray-300 text-gray-600'}`}
+                    ${selectedService?.id === service.id ? 'bg-blue-500 text-white' : 'border-gray-300 text-gray-600'}`}
                 >
                     <div className='flex justify-between'>
                         <span>{service.name}</span>

@@ -1,19 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createShop } from "../redux/slices/shopSlice";
+import { createShop, setVendorShop } from "../redux/slices/shopSlice";
 import { fetchCities, fetchDistricts } from "../redux/slices/locationSlice";
 import { assets } from "../assets/assets";
 
 const Add = () => {
-
   const dispatch = useDispatch();
   const { loading, error } = useSelector(state => state.shop);
   const { cityList, districtList } = useSelector(state => state.location);
 
-  const [token, setToken] = useState('')
+  const [token, setToken] = useState("");
 
-
-  /* ================= IMAGES (AYRI AYRI) ================= */
+  /* ================= IMAGES ================= */
   const [image1, setImage1] = useState(null);
   const [image2, setImage2] = useState(null);
   const [image3, setImage3] = useState(null);
@@ -40,17 +38,15 @@ const Add = () => {
   const [empServices, setEmpServices] = useState([]);
 
   /* ================= EFFECT ================= */
-
   useEffect(() => {
     dispatch(fetchCities());
   }, [dispatch]);
 
   useEffect(() => {
-    if (!token && localStorage.getItem('token')) {
-      setToken(localStorage.getItem('token'))
+    if (!token && localStorage.getItem("token")) {
+      setToken(localStorage.getItem("token"));
     }
-  }, [])
-
+  }, []);
 
   /* ================= HELPERS ================= */
   const addService = () => {
@@ -85,10 +81,40 @@ const Add = () => {
     setEmpServices([]);
   };
 
+  const removeEmployee = id => {
+    setEmployees(prev => prev.filter(emp => emp.id !== id));
+  };
+
+  const removeService = id => {
+    setServices(prev => prev.filter(s => s.id !== id));
+    setEmpServices(prev => prev.filter(sid => sid !== id));
+    setEmployees(prev =>
+      prev
+        .map(emp => ({
+          ...emp,
+          services: emp.services.filter(sid => sid !== id)
+        }))
+        .filter(emp => emp.services.length > 0)
+    );
+  };
+
   /* ================= SUBMIT ================= */
-  const submitHandler = (e) => {
+  const submitHandler = e => {
     e.preventDefault();
-    console.log("submitHandler tetiklendi");
+
+    const shopData = {
+      name,
+      description,
+      category,
+      salonType,
+      city,
+      district,
+      services,
+      employees,
+      images: [image1, image2, image3, image4]
+    };
+
+    dispatch(setVendorShop(shopData));
 
     const formData = new FormData();
 
@@ -98,7 +124,7 @@ const Add = () => {
     formData.append("salonType", salonType);
     formData.append("city", city);
     formData.append("district", district);
-    formData.append("text", `${district}/${city}`)
+    formData.append("text", `${district}/${city}`);
 
     image1 && formData.append("image1", image1);
     image2 && formData.append("image2", image2);
@@ -107,14 +133,14 @@ const Add = () => {
 
     formData.append("services", JSON.stringify(services));
 
-    // 🔥 EMPLOYEE IMAGES (AYNI MANTIK)
+    // 🔥 EMPLOYEE IMAGES
     employees.forEach(emp => {
       if (emp.image) {
         formData.append("empImages", emp.image);
       }
     });
 
-    // employees JSON (image yok!)
+    // 🔥 EMPLOYEES JSON (image hariç)
     formData.append(
       "employees",
       JSON.stringify(
@@ -129,101 +155,36 @@ const Add = () => {
     dispatch(createShop(formData));
   };
 
-
-
   return (
     <form onSubmit={submitHandler} className="flex flex-col gap-4 max-w-xl">
+      <h2 className="font-bold text-xl">İşletme Bilgileri</h2>
 
-      <h2 className="font-bold text-xl">Add Shop</h2>
-
-      {/* ================= IMAGES ================= */}
-      <div>
-        <p className="mb-2">Upload Images</p>
-        <div className="flex gap-2">
-          <label htmlFor="image1">
-            <img className="w-20 h-20 object-cover cursor-pointer"
-              src={!image1 ? assets.upload_area : URL.createObjectURL(image1)} />
-            <input hidden type="file" id="image1" onChange={e => setImage1(e.target.files[0])} />
-          </label>
-
-          <label htmlFor="image2">
-            <img className="w-20 h-20 object-cover cursor-pointer"
-              src={!image2 ? assets.upload_area : URL.createObjectURL(image2)} />
-            <input hidden type="file" id="image2" onChange={e => setImage2(e.target.files[0])} />
-          </label>
-
-          <label htmlFor="image3">
-            <img className="w-20 h-20 object-cover cursor-pointer"
-              src={!image3 ? assets.upload_area : URL.createObjectURL(image3)} />
-            <input hidden type="file" id="image3" onChange={e => setImage3(e.target.files[0])} />
-          </label>
-
-          <label htmlFor="image4">
-            <img className="w-20 h-20 object-cover cursor-pointer"
-              src={!image4 ? assets.upload_area : URL.createObjectURL(image4)} />
-            <input hidden type="file" id="image4" onChange={e => setImage4(e.target.files[0])} />
-          </label>
-        </div>
-      </div>
-
-      {/* ================= SHOP INFO ================= */}
-      <input value={name} onChange={e => setName(e.target.value)} placeholder="Shop name" />
-      <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Description" />
-
-      <input value={category} onChange={e => setCategory(e.target.value)} placeholder="Category" />
-      <input value={salonType} onChange={e => setSalonType(e.target.value)} placeholder="Salon Type" />
-
-      {/* ================= LOCATION ================= */}
-      <select value={city} onChange={e => {
-        setCity(e.target.value);
-        dispatch(fetchDistricts(e.target.value));
-      }}>
-        <option value="">City</option>
-        {cityList.map(city => <option key={city.id} value={city.name}>{city.name}</option>)}
-      </select>
-
-      <select value={district} onChange={e => setDistrict(e.target.value)}>
-        <option value="">District</option>
-        {districtList.map(district => <option key={district.id} value={district.name}>{district.name}</option>)}
-      </select>
-
-      {/* ================= SERVICES ================= */}
+      {/* IMAGES */}
       <div className="flex gap-2">
-        <input value={serviceName} onChange={e => setServiceName(e.target.value)} placeholder="Service name" />
-        <input value={price} onChange={e => setPrice(e.target.value)} placeholder="Price" />
-        <button type="button" onClick={addService}>+</button>
+        {[image1, image2, image3, image4].map((img, i) => (
+          <label key={i} className="border border-dashed cursor-pointer">
+            <img
+              className="w-20 h-20 object-cover"
+              src={!img ? assets.upload_area : URL.createObjectURL(img)}
+            />
+            <input
+              hidden
+              type="file"
+              onChange={e => {
+                const setters = [setImage1, setImage2, setImage3, setImage4];
+                setters[i](e.target.files[0]);
+              }}
+            />
+          </label>
+        ))}
       </div>
 
-      {services.map(s => (
-        <p key={s.id}>{s.name} - {s.price}₺</p>
-      ))}
+      {/* FORM */}
+      <input value={name} onChange={e => setName(e.target.value)} placeholder="İşletme ismi" />
+      <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Açıklama" />
 
-      {/* ================= EMPLOYEES ================= */}
-      <input value={empName} onChange={e => setEmpName(e.target.value)} placeholder="Employee name" />
-      <input value={empDesc} onChange={e => setEmpDesc(e.target.value)} placeholder="Employee description" />
-      <input type="file" onChange={e => setEmpImage(e.target.files[0])} />
-
-      {services.map(s => (
-        <label key={s.id}>
-          <input
-            type="checkbox"
-            checked={empServices.includes(s.id)}
-            onChange={() =>
-              setEmpServices(prev =>
-                prev.includes(s.id)
-                  ? prev.filter(id => id !== s.id)
-                  : [...prev, s.id]
-              )
-            }
-          />
-          {s.name}
-        </label>
-      ))}
-
-      <button type="button" onClick={addEmployee}>Add Employee</button>
-
-      <button type="submit" disabled={loading}>
-        {loading ? "Ekleniyor..." : "ADD SHOP"}
+      <button type="submit" disabled={loading} className="bg-black text-white py-2 rounded">
+        {loading ? "Ekleniyor..." : "İşletmeyi Oluştur"}
       </button>
 
       {error && <p className="text-red-500">{error}</p>}
@@ -231,4 +192,4 @@ const Add = () => {
   );
 };
 
-export default Add;  
+export default Add;

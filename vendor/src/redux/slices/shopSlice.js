@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 
+
 /* ================= ASYNC ================= */
 export const createShop = createAsyncThunk(
   "shop/createShop",
@@ -32,28 +33,34 @@ const shopSlice = createSlice({
   initialState: {
     loading: false,
     error: null,
+    vendorShop: null, // 👈 UI için
   },
   reducers: {
-    resetShopState: state => {
+    setVendorShop: (state, action) => {
+      state.vendorShop = action.payload;
+    },
+    clearVendorShop: (state) => {
+      state.vendorShop = null;
+    },
+    resetShopState: (state) => {
       state.loading = false;
       state.error = null;
-    }
+    },
   },
-  extraReducers: builder => {
+  extraReducers: (builder) => {
     builder
-      .addCase(createShop.pending, state => {
+      .addCase(createShop.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(createShop.fulfilled, state => {
+      .addCase(createShop.fulfilled, (state) => {
         state.loading = false;
       })
       .addCase(createShop.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
-  }
+  },
 });
-
-export const { resetShopState } = shopSlice.actions;
+export const { resetShopState,setVendorShop,clearVendorShop } = shopSlice.actions;
 export default shopSlice.reducer;

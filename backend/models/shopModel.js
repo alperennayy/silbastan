@@ -13,7 +13,7 @@ const shopSchema = new mongoose.Schema({
     category: { type: String, required: true },
 
     salonType: { type: String, required: true },
-
+                    
     location: {
         city: { type: String, required: true },
         district: { type: String, required: true },

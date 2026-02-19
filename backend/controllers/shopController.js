@@ -82,11 +82,26 @@ export const createShop = async (req, res) => {
 
         res.json({ success: true, message: "Shop added", shop });
     } catch (error) {
+    console.log("Mongoose Kayıt Hatası:", error.errors); // Hangi alanın hata verdiğini söyler
+    res.json({ success: false, message: error.message });
+}
+};
+// shopController.js içine ekle
+export const getMyStore = async (req, res) => {
+    try {
+        // authVendor middleware'inden gelen req.vendor.id kullanılıyor
+        const shop = await Shop.findOne({ vendorId: req.vendor.id });
+
+        if (!shop) {
+            return res.json({ success: false, message: "Henüz bir mağaza oluşturulmamış" });
+        }
+
+        res.json({ success: true, shop });
+    } catch (error) {
         console.log(error);
         res.json({ success: false, message: error.message });
     }
 };
-
 export const listShops = async (req, res) => {
     try {
 

@@ -14,7 +14,7 @@ const Navbar = () => {
   const logoutHandler = async () => {
     try {
       await dispatch(logoutUser()).unwrap();
-      window.location.href = "http://localhost:5174/login";
+      window.location.href = "http://localhost:5173/login";
     } catch (err) {
       console.error(err);
     }

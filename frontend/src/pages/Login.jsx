@@ -20,7 +20,7 @@ const Login = () => {
         if (isAuthenticated) {
             if (role === "vendor") {
                 // Vendor paneli ayrı bir projedeyse, tam URL’ye yönlendir
-                window.location.href = "http://localhost:5173/add";
+                window.location.href = "http://localhost:5174/add";
             } else {
                 navigate("/"); // Normal kullanıcı
             }

@@ -2,9 +2,7 @@ import React from 'react'
 import { assets } from '../assets/assets'
 import { useDispatch } from "react-redux";
 import { useNavigate } from 'react-router-dom'
-import { logoutUser } from '../../../frontend/src/redux/slices/authSlice';
-
-
+import { logoutVendor } from '../redux/slices/authSlice';
 
 const Navbar = () => {
 
@@ -13,8 +11,8 @@ const Navbar = () => {
 
   const logoutHandler = async () => {
     try {
-      await dispatch(logoutUser()).unwrap();
-      window.location.href = "http://localhost:5173/login";
+      await dispatch(logoutVendor()).unwrap();
+      window.location.href = "http://localhost:5174";
     } catch (err) {
       console.error(err);
     }

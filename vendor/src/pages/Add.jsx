@@ -6,11 +6,7 @@ import ShopCart from "../pages/ShopCart.jsx"
 import { assets } from "../assets/assets";
 
 
-
-
 const Add = () => {
-
-
 
     const dispatch = useDispatch();
     const { loading, error, vendorShop } = useSelector(state => state.shop);

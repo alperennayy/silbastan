@@ -1,48 +1,48 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from 'axios'
 
-/* LOGIN */
-export const loginClient = createAsyncThunk(
-    "auth/loginClient",
-    async ({ email, password }, { rejectWithValue }) => {
-        try {
-            const response = await axios.post(
-                `${import.meta.env.VITE_BACKEND_URL}/api/auth/client/login`,
-                { email, password },
-                { withCredentials: true }
-            );
-            return response.data; // { success, role }
-        } catch (error) {
-            return rejectWithValue(error.message);
-        }
-    }
-);
-
-
-/* REGISTER */
-export const registerClient = createAsyncThunk(
-    "auth/registerUser",
+export const registerVendor = createAsyncThunk(
+    "auth/registerVendor",
     async ({ name, email, password }, { rejectWithValue }) => {
         try {
+
             const response = await axios.post(
-                `${import.meta.env.VITE_BACKEND_URL}/api/auth/client/register`,
+                `${import.meta.env.VITE_BACKEND_URL}/api/auth/vendor/register`,
                 { name, email, password },
                 { withCredentials: true }
             );
-            return response.data;
+
+            return response.data
 
         } catch (error) {
             return rejectWithValue(error.message);
         }
     }
-);
+)
 
-export const logoutClient = createAsyncThunk(
+export const loginVendor = createAsyncThunk(
+    "auth/loginVendor",
+    async ({ email, password }, { rejectWithValue }) => {
+        try {
+            const response = await axios.post(
+                `${import.meta.env.VITE_BACKEND_URL}/api/auth/vendor/login`,
+                { email, password },
+                { withCredentials: true }
+            );
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.message);
+
+        }
+    }
+)
+
+export const logoutVendor = createAsyncThunk(
     "auth/logoutUser",
     async (_, { rejectWithValue }) => {
         try {
             const response = await axios.post(
-                `${import.meta.env.VITE_BACKEND_URL}/api/auth/client/logout`,
+                `${import.meta.env.VITE_BACKEND_URL}/api/auth/vendor/logout`,
                 {},
                 { withCredentials: true }
             );
@@ -53,57 +53,54 @@ export const logoutClient = createAsyncThunk(
     }
 )
 
+
 const authSlice = createSlice({
     name: "auth",
     initialState: {
         isAuthenticated: false,
         loading: false,
         error: null,
-        // loggedOut: false
     },
     reducers: {
 
     },
     extraReducers: (builder) => {
         builder
-            /* LOGIN */
-            .addCase(loginClient.pending, (state) => {
+            .addCase(loginVendor.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(loginClient.fulfilled, (state, action) => {
+            .addCase(loginVendor.fulfilled, (state) => {
                 state.loading = false;
                 state.isAuthenticated = true;
-            })
-            .addCase(loginClient.rejected, (state, action) => {
+            }).addCase(loginVendor.rejected, (state) => {
                 state.loading = false;
                 state.error = action.payload;
             })
-
             /* REGISTER */
-            .addCase(registerClient.pending, (state) => {
+            .addCase(registerVendor.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(registerClient.fulfilled, (state, action) => {
+            .addCase(registerVendor.fulfilled, (state, action) => {
                 state.loading = false;
                 state.isAuthenticated = true;
             })
-            .addCase(registerClient.rejected, (state, action) => {
+            .addCase(registerVendor.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             })
 
             /* LOGOUT */
-            .addCase(logoutClient.pending, (state) => {
+            .addCase(logoutVendor.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(logoutClient.fulfilled, (state) => {
+            .addCase(logoutVendor.fulfilled, (state) => {
                 state.loading = false;
                 state.isAuthenticated = false; // 🔥 çıkış yapıldı
             })
-            .addCase(logoutClient.rejected, (state, action) => {
+            .addCase(logoutVendor.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             });

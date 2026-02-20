@@ -106,7 +106,25 @@ const Home = () => {
     return (
         <div className='flex bg-gray-100 h-[400px]'>
 
-            <div className='w-[60%]'></div>
+            <div className='w-[60%] flex items-center justify-center '>
+                <div className='text-center max-w-md px-6'>
+                    <h2 className='text-2xl font-semibold mb-4'>
+                        Mağaza mı oluşturmak istiyorsunuz?
+                    </h2>
+
+                    <p className='text-gray-600 mb-6'>
+                        Kendi mağazanızı açarak müşterilere ulaşabilir,
+                        hizmetlerinizi kolayca yönetebilirsiniz.
+                    </p>
+
+                    <button
+                        className='bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition'
+                        onClick={() => window.open("http://localhost:5174", "_blank")}
+                    >
+                        Hemen Başla
+                    </button>
+                </div>
+            </div>
 
             <div className='w-[40%] flex items-center justify-center'>
                 <div ref={wrapperRef} className='flex flex-col gap-4 w-[80%] relative'>

@@ -11,7 +11,7 @@ export const loginClient = createAsyncThunk(
                 { email, password },
                 { withCredentials: true }
             );
-            return response.data; // { success, role }
+            return response.data;
         } catch (error) {
             return rejectWithValue(error.message);
         }
@@ -58,8 +58,7 @@ const authSlice = createSlice({
     initialState: {
         isAuthenticated: false,
         loading: false,
-        error: null,
-        // loggedOut: false
+        error: null
     },
     reducers: {
 
@@ -74,6 +73,7 @@ const authSlice = createSlice({
             .addCase(loginClient.fulfilled, (state, action) => {
                 state.loading = false;
                 state.isAuthenticated = true;
+                state.error = null;
             })
             .addCase(loginClient.rejected, (state, action) => {
                 state.loading = false;
@@ -88,6 +88,7 @@ const authSlice = createSlice({
             .addCase(registerClient.fulfilled, (state, action) => {
                 state.loading = false;
                 state.isAuthenticated = true;
+                state.error = null;
             })
             .addCase(registerClient.rejected, (state, action) => {
                 state.loading = false;
@@ -101,7 +102,7 @@ const authSlice = createSlice({
             })
             .addCase(logoutClient.fulfilled, (state) => {
                 state.loading = false;
-                state.isAuthenticated = false; // 🔥 çıkış yapıldı
+                state.isAuthenticated = false;
             })
             .addCase(logoutClient.rejected, (state, action) => {
                 state.loading = false;

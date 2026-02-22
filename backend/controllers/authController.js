@@ -156,7 +156,12 @@ export const registerClient = async (req, res) => {
         })
 
         return res.json({
-            success: true
+            success: true,
+            user: {
+                _id: client._id,
+                name: client.name,
+                email: client.email
+            }
         })
 
     } catch (error) {
@@ -198,7 +203,14 @@ export const loginClient = async (req, res) => {
             maxAge: 7 * 24 * 60 * 60 * 1000
         });
 
-        return res.json({ success: true });
+        return res.json({
+            success: true,
+            user: {
+                _id: client._id,
+                name: client.name,
+                email: client.email
+            }
+        });
 
     } catch (error) {
         return res.json({ success: false, message: error.message })

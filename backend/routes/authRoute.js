@@ -9,7 +9,7 @@ authRouter.post('/vendor/login', loginVendor);
 authRouter.post('/vendor/logout', logoutVendor);
 authRouter.post('/client/register', registerClient);
 authRouter.post('/client/login', loginClient)
-authRouter.post('/cleint/logout', logoutClient);
+authRouter.post('/client/logout', logoutClient);
 
 
 export default authRouter;

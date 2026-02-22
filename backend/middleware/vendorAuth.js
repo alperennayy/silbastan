@@ -11,7 +11,7 @@ const authVendor = (req, res, next) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
         // Controller'da kullanmak için
-        req.vendor = { id: decoded.id, role: decoded.role };
+        req.vendor = { id: decoded.id };
         next();
     } catch (error) {
         console.log(error);

@@ -1,4 +1,4 @@
-import React from 'react'
+import { useEffect } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Home from './pages/Home.jsx'
@@ -10,10 +10,19 @@ import Footer from './components/Footer.jsx'
 import MakeReservation from './pages/MakeReservation.jsx'
 import ReservationDetail from './pages/ReservationDetail.jsx'
 import Login from './pages/Login.jsx'
+import Profile from './pages/Profile.jsx'
+import { useDispatch } from 'react-redux'
+import { fetchClientData } from './redux/slices/userSlice.js'
 
 
 const App = () => {
 
+
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(fetchClientData());
+  }, [dispatch]);
 
   return (
     <div className='px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]'>
@@ -24,6 +33,7 @@ const App = () => {
         <Route path='/about' element={<About />} />
         <Route path='/contact' element={<Contact />} />
         <Route path='/login' element={<Login />} />
+        <Route path='/profile' element={<Profile />} />
         <Route path='/shop/:shopId' element={<Shop />} />
         <Route path='/shop/:shopId/make-reservation' element={<MakeReservation />} />
         <Route path='/shop/:shopId/make-reservation/:service/:serviceId/:employee/:employeeId' element={<ReservationDetail />} />

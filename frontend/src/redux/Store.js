@@ -4,6 +4,7 @@ import filterReducer from './slices/filterSlice.js'
 import shopReducer from './slices/shopSlice.js'
 import reservationReducer from './slices/reservationSlice.js'
 import authReducer from './slices/authSlice.js'
+import userReducer from './slices/userSlice.js'
 
 
 export const store = configureStore({
@@ -12,6 +13,7 @@ export const store = configureStore({
         filter: filterReducer,
         shop: shopReducer,
         reservation: reservationReducer,
-        auth: authReducer
+        auth: authReducer,
+        user: userReducer,
     },
 })

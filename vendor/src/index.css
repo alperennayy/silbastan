@@ -1,1 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Prata&display=swap');
+
 @import "tailwindcss";
+
+/* Tüm elemanlara, inputlara ve butonlara fontu zorunlu kıl */
+* {
+    font-family: 'Outfit', sans-serif !important;
+}
+
+body {
+    background-color: #F8F9FD;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar'ı gizleme kuralı */
+::-webkit-scrollbar {
+    display: none;
+}
+
+/* Aktif link altındaki çizgi */
+a.active hr {
+    display: block;
+}
+
+@media (max-width:640px) {
+    a.active {
+        background-color: black;
+        color: white;
+    }
+}

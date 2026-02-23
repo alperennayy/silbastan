@@ -2,6 +2,7 @@ import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import { useSelector } from "react-redux";
 import Login from './pages/Login.jsx'
 import Add from './pages/Add.jsx'
+import Randevu from './pages/Randevu.jsx'
 import Navbar from './components/Navbar.jsx'
 import Sidebar from './components/Sidebar.jsx'
 
@@ -9,6 +10,7 @@ import Sidebar from './components/Sidebar.jsx'
 const App = () => {
 
   const { isAuthenticated } = useSelector((state) => state.auth);
+  const isLogged = isAuthenticated || localStorage.getItem('isVendorLogged') === 'true';
 
   const location = useLocation()
   const isLoginPage = location.pathname === "/";
@@ -17,7 +19,7 @@ const App = () => {
     <div>
 
       {/* Login yapıldıysa navbar + sidebar göster */}
-      {!isLoginPage && (
+      {!isLoginPage && isLogged && (
         <>
           <Navbar />
           <hr />
@@ -28,8 +30,13 @@ const App = () => {
                 <Route
                   path='/add'
                   element={
-                    isAuthenticated ? <Add /> : <Navigate to='/' />
+                    isLogged ? <Add /> : <Navigate to='/' />
                   }
+                />
+                {/* Randevu Takip Rotası  */}
+                <Route
+                  path='/list'
+                  element={isLogged ? <Randevu /> : <Navigate to='/' />}
                 />
               </Routes>
             </div>

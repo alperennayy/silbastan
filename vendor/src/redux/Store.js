@@ -3,11 +3,13 @@ import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./slices/authSlice"
 import shopReducer from "./slices/shopSlice";
 import locationReducer from "./slices/locationSlice";
+import randevuReducer from "./slices/randevuSlice"
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     shop: shopReducer,
-    location: locationReducer
+    location: locationReducer,
+    randevu: randevuReducer
   }
 });

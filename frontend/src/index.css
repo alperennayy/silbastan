@@ -2,16 +2,25 @@
 
 @import "tailwindcss";
 
+/* Tüm elemanlara, inputlara ve butonlara fontu zorunlu kıl */
 * {
-    font-family: Outfit;
+    font-family: 'Outfit', sans-serif !important;
 }
 
-a.active hr {
-    display: block;
+body {
+    background-color: #F8F9FD;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
+/* Scrollbar'ı gizleme kuralın zaten okey */
 ::-webkit-scrollbar {
     display: none;
+}
+
+/* Aktif link altındaki çizgi */
+a.active hr {
+    display: block;
 }
 
 @media (max-width:640px) {

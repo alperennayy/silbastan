@@ -19,7 +19,7 @@ const Navbar = () => {
 
     const handleLogout = async () => {
         await dispatch(logoutClient());
-        dispatch(fetchClientData()); // user null olacak
+        dispatch(fetchClientData()); 
         navigate('/');
     };
 

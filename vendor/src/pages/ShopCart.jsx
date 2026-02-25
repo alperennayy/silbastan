@@ -1,17 +1,23 @@
-import React, { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { fetchVendorShop } from "../redux/slices/shopSlice";
+import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch} from "react-redux";
+import Add from "./Add"
+import { fetchVendorShop , deleteShop} from "../redux/slices/shopSlice";
 
 const ShopCart = () => {
   const dispatch = useDispatch();
   const { vendorShop, loading } = useSelector((state) => state.shop);
-
+  const [isEditing, setIsEditing] = useState(false);
   useEffect(() => {
     if (!vendorShop) {
       dispatch(fetchVendorShop());
     }
   }, [dispatch, vendorShop]);
-
+  // Silme fonksiyonu
+  const handleDelete = () => {
+    if (window.confirm("Mağazanızı silmek istediğinize emin misiniz? Bu işlem geri alınamaz.")) {
+      dispatch(deleteShop(vendorShop._id));
+    }
+  };
   const getImageUrl = (img) => {
     if (!img) return null;
     if (typeof img === "string") return img;
@@ -30,7 +36,9 @@ const ShopCart = () => {
     }
     return data;
   };
-
+  if (isEditing) {
+    return <Add isEditMode={true} setEditing={setIsEditing} />;
+  }
   if (loading) return (
     <div className="flex items-center justify-center min-h-[400px]">
       <div className="w-8 h-8 border-2 border-rose-500 border-t-transparent rounded-full animate-spin"></div>
@@ -49,7 +57,21 @@ const ShopCart = () => {
 
   return (
     <div className="w-full max-w-5xl mx-auto p-4 md:p-8 space-y-10 bg-gray-50/50 min-h-screen">
-      
+      {/* 🛠️ AKSİYON BUTONLARI (En üste ekledik) */}
+      <div className="flex justify-end gap-4 mb-4">
+        <button 
+          onClick={() => setIsEditing(true)}
+          className="px-6 py-2 bg-slate-800 text-white rounded-xl text-xs font-bold uppercase hover:bg-slate-700 transition-all"
+        >
+          Bilgileri Düzenle
+        </button>
+        <button 
+          onClick={handleDelete}
+          className="px-6 py-2 bg-red-100 text-red-600 rounded-xl text-xs font-bold uppercase hover:bg-red-600 hover:text-white transition-all"
+        >
+          Mağazayı Sil
+        </button>
+      </div>
       {/* 1. ANA PROFİL KARTI */}
       <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 overflow-hidden border border-gray-100">
         <div className="h-48 w-full bg-gray-200 relative">

@@ -71,8 +71,8 @@ export const createShop = async (req, res) => {
             services: JSON.parse(services),   
             employees: employeesParsed, 
             date: Date.now(),
-            rating: 0, g,
-            vendorId: req.vendor.id /
+            rating: 0, 
+            vendorId: req.vendor.id 
         };
 
         // =================== SAVE ===================

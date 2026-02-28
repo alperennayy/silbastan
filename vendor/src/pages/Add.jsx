@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createShop, fetchVendorShop, updateShop } from "../redux/slices/shopSlice.js";
 import { fetchCities, fetchDistricts } from "../redux/slices/locationSlice.js";
-import ShopCart from "../pages/ShopCart.jsx"
 import { assets } from "../assets/assets";
 
 
@@ -53,27 +52,8 @@ const Add = ({ isEditMode = false, setEditing = null }) => {
             setToken(localStorage.getItem('token'));
         }
     }, [token]);
-    useEffect(() => {
-    if (isEditMode && vendorShop && vendorShop.employees) {
-        setName(vendorShop.name || "");
-        setDescription(vendorShop.description || "");
-        setCategory(vendorShop.category || "");
-        setSalonType(vendorShop.salonType || "");
-        setCity(vendorShop.location?.city || "");
-        setDistrict(vendorShop.location?.district || "");
-        setServices(vendorShop.services || []);
-        
-        const initialEmployees = vendorShop.employees.map(emp => ({
-            name: emp.name,
-            description: emp.description,
-            image: emp.image,
-            services: emp.services,
-            id: String(emp._id || emp.id)
-        }));
-        
-        setEmployees(initialEmployees);
-    }
-}, [isEditMode, vendorShop]);  // employees.length dependency'den çıkarıldı
+
+
 
     /* ================= HELPERS ================= */
     const addService = () => {
@@ -108,13 +88,7 @@ const Add = ({ isEditMode = false, setEditing = null }) => {
         setEmpImage(null);
         setEmpServices([]);
     };
-    // removeEmployee
-    const removeEmployee = (targetId) => {
-    if (!targetId) return;
-    setEmployees(prev => prev.filter(emp => String(emp.id) !== String(targetId)));
-    };
-   
-    
+
     /* ================= SUBMIT ================= */
     const submitHandler = (e) => {
         e.preventDefault();
@@ -143,35 +117,17 @@ const Add = ({ isEditMode = false, setEditing = null }) => {
         });
 
 
-
-
         // SERVICES
         formData.append("services", JSON.stringify(services));
-        formData.append("employees", JSON.stringify(employees.map(e => ({ 
-    name: e.name, 
-    description: e.description, 
-    services: e.services,
-    image: e.image // Mevcut resim URL'ini veya yeni dosyayı korumak için
-}))));
-        if (isEditMode) {
-        // GÜNCELLEME
-        dispatch(updateShop({ id: vendorShop._id, formData }));
-        setEditing(false); // İşlem bitince ShopCart'a geri dön
-    } else {
-        // YENİ OLUŞTURMA
-        dispatch(createShop(formData));
-    }
-
-
-
+        formData.append("employees", JSON.stringify(employees.map(e => ({
+            name: e.name,
+            description: e.description,
+            services: e.services,
+            image: e.image // Mevcut resim URL'ini veya yeni dosyayı korumak için
+        }))));
 
         console.log("submitHandler tetiklendi");
     };
-
-
-    if (vendorShop && !isEditMode) {
-        return <ShopCart />;
-    }
 
 
     return (
@@ -183,29 +139,29 @@ const Add = ({ isEditMode = false, setEditing = null }) => {
             <div>
                 <div className="flex gap-2">
                     {[image1, image2, image3, image4].map((img, i) => {
-            // Mantık: Eğer yeni dosya seçildiyse onun URL'ini oluştur, 
-            // seçilmediyse ve edit modundaysak veritabanındaki resmi göster.
-            const currentImg = img ? URL.createObjectURL(img) : (vendorShop?.images?.[i] || assets.upload_area);
-            
-            return (
-                <label key={i} htmlFor={`image${i + 1}`} className="border border-dashed border-gray-300 cursor-pointer">
-                    <img
-                        className="w-20 h-20 object-cover rounded-md"
-                        src={currentImg}
-                        alt="shop"
-                    />
-                    <input
-                        hidden
-                        type="file"
-                        id={`image${i + 1}`}
-                        onChange={e => {
-                            const setters = [setImage1, setImage2, setImage3, setImage4];
-                            setters[i](e.target.files[0]);
-                        }}
-                    />
-                </label>
-            );
-        })}
+                        // Mantık: Eğer yeni dosya seçildiyse onun URL'ini oluştur, 
+                        // seçilmediyse ve edit modundaysak veritabanındaki resmi göster.
+                        const currentImg = img ? URL.createObjectURL(img) : (vendorShop?.images?.[i] || assets.upload_area);
+
+                        return (
+                            <label key={i} htmlFor={`image${i + 1}`} className="border border-dashed border-gray-300 cursor-pointer">
+                                <img
+                                    className="w-20 h-20 object-cover rounded-md"
+                                    src={currentImg}
+                                    alt="shop"
+                                />
+                                <input
+                                    hidden
+                                    type="file"
+                                    id={`image${i + 1}`}
+                                    onChange={e => {
+                                        const setters = [setImage1, setImage2, setImage3, setImage4];
+                                        setters[i](e.target.files[0]);
+                                    }}
+                                />
+                            </label>
+                        );
+                    })}
                 </div>
             </div>
 
@@ -409,82 +365,82 @@ const Add = ({ isEditMode = false, setEditing = null }) => {
                 </button>
 
                 {/* employee list: name – services */}
-{employees.map((emp, index) => {
-    // Benzersiz bir ID belirleyelim. 
-    const employeeKey = emp.id || `emp-${index}`; 
-    
-    return (
-        <div
-            key={employeeKey}
-            className="flex items-center justify-between gap-4 p-3 rounded-xl border bg-white transition hover:shadow-md hover:border-black group"
-        >
-            <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full overflow-hidden border bg-gray-100">
-                    {emp.image ? (
-                        <img
-                            src={emp.image instanceof File ? URL.createObjectURL(emp.image) : emp.image}
-                            className="w-full h-full object-cover"
-                            alt={emp.name}
-                        />
-                    ) : (
-                        <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">?</div>
-                    )}
-                </div>
+                {employees.map((emp, index) => {
+                    // Benzersiz bir ID belirleyelim. 
+                    const employeeKey = emp.id || `emp-${index}`;
 
-                <div className="flex flex-col">
-                    <span className="font-semibold text-sm">{emp.name}</span>
-                    <div className="flex flex-wrap gap-1">
-                        {emp.services.map(sId => {
-                            const service = services.find(s => (s.id === sId || s._id === sId));
-                            return service ? (
-                                <span key={sId} className="px-2 py-[2px] text-[10px] rounded-full bg-gray-100 text-gray-600">
-                                    {service.name}
-                                </span>
-                            ) : null;
-                        })}
-                    </div>
-                </div>
+                    return (
+                        <div
+                            key={employeeKey}
+                            className="flex items-center justify-between gap-4 p-3 rounded-xl border bg-white transition hover:shadow-md hover:border-black group"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full overflow-hidden border bg-gray-100">
+                                    {emp.image ? (
+                                        <img
+                                            src={emp.image instanceof File ? URL.createObjectURL(emp.image) : emp.image}
+                                            className="w-full h-full object-cover"
+                                            alt={emp.name}
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">?</div>
+                                    )}
+                                </div>
+
+                                <div className="flex flex-col">
+                                    <span className="font-semibold text-sm">{emp.name}</span>
+                                    <div className="flex flex-wrap gap-1">
+                                        {emp.services.map(sId => {
+                                            const service = services.find(s => (s.id === sId || s._id === sId));
+                                            return service ? (
+                                                <span key={sId} className="px-2 py-[2px] text-[10px] rounded-full bg-gray-100 text-gray-600">
+                                                    {service.name}
+                                                </span>
+                                            ) : null;
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* 🗑️ SİLME BUTONU */}
+                            <button
+                                type="button"
+                                onClick={() => removeEmployee(emp.id)}
+                                className="text-red-500 hover:bg-red-50 p-2 rounded-full transition-all"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" />
+                                </svg>
+                            </button>
+                        </div>
+                    );
+                })}
+
+
+
+
             </div>
 
-            {/* 🗑️ SİLME BUTONU */}
             <button
-                type="button"
-                onClick={() => removeEmployee(emp.id)}
-                className="text-red-500 hover:bg-red-50 p-2 rounded-full transition-all"
+                type="submit"
+                disabled={loading}
+                className="mt-2 px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 disabled:opacity-50"
             >
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>
-                </svg>
+                {loading ? "İşleniyor..." : (isEditMode ? "Bilgileri Güncelle" : "İşletmeyi Oluştur")}
             </button>
-        </div>
-    );
-})}
-
-
-
-
-            </div>
-
-            <button
-    type="submit"
-    disabled={loading}
-    className="mt-2 px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 disabled:opacity-50"
->
-    {loading ? "İşleniyor..." : (isEditMode ? "Bilgileri Güncelle" : "İşletmeyi Oluştur")}
-</button>
 
             {error && <p className="text-red-500">{error}</p>}
             {isEditMode && (
-    <button 
-        type="button" 
-        onClick={() => setEditing(false)}
-        className="self-end text-sm text-gray-500 underline"
-    >
-        Düzenlemeyi İptal Et
-    </button>
-)}
+                <button
+                    type="button"
+                    onClick={() => setEditing(false)}
+                    className="self-end text-sm text-gray-500 underline"
+                >
+                    Düzenlemeyi İptal Et
+                </button>
+            )}
         </form>
-    
+
     );
 
 

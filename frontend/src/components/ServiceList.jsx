@@ -9,6 +9,8 @@ const ServiceList = () => { // 🔥 Props almıyor!
     const { selectedService } = useSelector(state => state.reservation)
     const { shopData } = useSelector(state => state.shop)
 
+
+
     // 🔥 Services yoksa veya yükleniyorsa
     if (!shopData || !shopData.services) {
         return (
@@ -24,10 +26,10 @@ const ServiceList = () => { // 🔥 Props almıyor!
         <div className='flex flex-col gap-3 text-sm text-gray-600 sm:w-1/3'>
             {shopData.services.map((service) => (
                 <button
-                    key={service.id}
+                    key={service._id}
                     onClick={() => dispatch(setSelectedService(service))}
                     className={`w-full pl-3 py-2 pr-6 text-start border rounded cursor-pointer transition-all 
-                    ${selectedService?.id === service.id ? 'bg-blue-500 text-white' : 'border-gray-300 text-gray-600'}`}
+                    ${selectedService?._id === service._id ? 'bg-blue-500 text-white' : 'border-gray-300 text-gray-600'}`}
                 >
                     <div className='flex justify-between'>
                         <span>{service.name}</span>

@@ -14,8 +14,8 @@ export const createShop = createAsyncThunk(
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/shops/create`,
         formData, {
-          withCredentials: true, // Cookie tabanlı auth için şart
-        }
+        withCredentials: true, // Cookie tabanlı auth için şart
+      }
       );
 
       // Backend'den gelen veriyi tam burada kontrol ediyoruz
@@ -23,8 +23,8 @@ export const createShop = createAsyncThunk(
       return response.data;
 
     } catch (error) {
-      console.error("Slice Hatası:", error.response ?.data);
-      return rejectWithValue(error.response ?.data ?.message || "Shop eklenemedi");
+      console.error("Slice Hatası:", error.response?.data);
+      return rejectWithValue(error.response?.data?.message || "Shop eklenemedi");
     }
   }
 );
@@ -42,48 +42,7 @@ export const fetchVendorShop = createAsyncThunk(
       );
       return response.data; // { success: true, shop: {...} } döndüğünü varsayıyoruz
     } catch (error) {
-      return rejectWithValue(error.response ?.data ?.message || "Mağaza yüklenemedi");
-    }
-  }
-);
-/* ================= UPDATE SHOP ================= */
-export const updateShop = createAsyncThunk(
-  "shop/updateShop",
-  async ({
-    id,
-    formData
-  }, {
-    rejectWithValue
-  }) => {
-    try {
-      const response = await axios.put(
-        `${import.meta.env.VITE_BACKEND_URL}/api/shops/update/${id}`,
-        formData, {
-          withCredentials: true
-        }
-      );
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Güncelleme başarısız");
-    }
-  }
-);
-
-/* ================= DELETE SHOP ================= */
-export const deleteShop = createAsyncThunk(
-  "shop/deleteShop",
-  async (id, {
-    rejectWithValue
-  }) => {
-    try {
-      const response = await axios.delete(
-        `${import.meta.env.VITE_BACKEND_URL}/api/shops/delete/${id}`, {
-          withCredentials: true
-        }
-      );
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response ?.data ?.message || "Silme başarısız");
+      return rejectWithValue(error.response?.data?.message || "Mağaza yüklenemedi");
     }
   }
 );
@@ -98,16 +57,7 @@ const shopSlice = createSlice({
     vendorShop: null,
   },
   reducers: {
-    setVendorShop: (state, action) => {
-      state.vendorShop = action.payload;
-    },
-    clearVendorShop: (state) => {
-      state.vendorShop = null;
-    },
-    resetShopState: (state) => {
-      state.loading = false;
-      state.error = null;
-    },
+
   },
   extraReducers: (builder) => {
     builder
@@ -143,25 +93,8 @@ const shopSlice = createSlice({
         state.error = action.payload;
       })
 
-      .addCase(updateShop.pending, (state) => {
-    state.loading = true;
-      })
-      .addCase(updateShop.fulfilled, (state, action) => {
-          state.loading = false;
-          if (action.payload.success) {
-              state.vendorShop = action.payload.shop; // State'i yeni gelen veriyle güncelle
-          }
-      })
-      .addCase(deleteShop.fulfilled, (state) => {
-          state.loading = false;
-          state.vendorShop = null; // Mağaza silindiği için null'a çekiyoruz, Add.jsx formu otomatik açılır
-      });
   },
 });
 
-export const {
-  resetShopState,
-  setVendorShop,
-  clearVendorShop
-} = shopSlice.actions;
+export const { } = shopSlice.actions;
 export default shopSlice.reducer;

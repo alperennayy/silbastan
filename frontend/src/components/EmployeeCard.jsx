@@ -10,10 +10,10 @@ const EmployeeCard = ({ employeeId }) => {
     const { selectedEmployee } = useSelector(state => state.reservation)
 
     // 🔥 employeeId'ye göre employee'yi shopData'dan bul
-    const employee = shopData?.employees?.find(emp => emp.id === employeeId)
+    const employee = shopData?.employees?.find(emp => emp._id === employeeId)
 
     // 🔥 Seçili mi kontrol et
-    const isSelected = selectedEmployee && selectedEmployee?.id === employeeId
+    const isSelected = selectedEmployee && selectedEmployee?._id === employeeId
 
     // 🔥 Employee bulunamazsa
     if (!employee) {
@@ -23,6 +23,9 @@ const EmployeeCard = ({ employeeId }) => {
             </div>
         )
     }
+
+    console.log(shopData)
+
 
     return (
         <button
@@ -50,10 +53,10 @@ const EmployeeCard = ({ employeeId }) => {
 
             {/* SERVICES */}
             {employee.services.map((serviceId) => {
-                const service = shopData.services.find(s => s.id === serviceId);
+                const service = shopData.services.find(s => s._id === serviceId);
                 if (!service) return null; // ID eşleşmezse atla
                 return (
-                    <p key={service.id} >
+                    <p key={service._id} >
                         {service.name}
                     </p>
                 );
